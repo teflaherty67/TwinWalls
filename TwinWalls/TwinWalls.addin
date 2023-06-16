@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Command">
+    <Text>Command TwinWalls</Text>
+    <Description>Some description for TwinWalls</Description>
+    <Assembly>TwinWalls.dll</Assembly>
+    <FullClassName>TwinWalls.Command</FullClassName>
+    <ClientId>ef044101-a714-4f42-8a2b-ab287b476163</ClientId>
+    <VendorId>com.YOUR COMPANY NAME</VendorId>
+    <VendorDescription>YOUR COMPANY NAME, YOUR COMPANY URL</VendorDescription>
+  </AddIn>
+  <AddIn Type="Application">
+    <Name>Application TwinWalls</Name>
+    <Assembly>TwinWalls.dll</Assembly>
+    <FullClassName>TwinWalls.App</FullClassName>
+    <ClientId>05988fa2-4038-4a39-8c07-763f32414d11</ClientId>
+    <VendorId>com.YOUR COMPANY NAME</VendorId>
+    <VendorDescription>YOUR COMPANY NAME, YOUR COMPANY URL</VendorDescription>
+  </AddIn>
+</RevitAddIns>
