@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Command">
+    <Text>TwinWalls - Command 1</Text>
+    <Description>Some description</Description>
+    <Assembly>TwinWalls\TwinWalls.dll</Assembly>
+    <FullClassName>TwinWalls.cmdTwinWalls</FullClassName>
+    <ClientId>1cfcb3f5-1d3a-4d66-bb57-6932b39ca55e</ClientId>
+    <VendorId>com.YOUR COMPANY NAME</VendorId>
+    <VendorDescription>YOUR COMPANY NAME, YOUR COMPANY URL</VendorDescription>
+  </AddIn>
+  <AddIn Type="Command">
+    <Text>TwinWalls - Command 2</Text>
+    <Description>Some description</Description>
+    <Assembly>TwinWalls\TwinWalls.dll</Assembly>
+    <FullClassName>TwinWalls.Command2</FullClassName>
+    <ClientId>ed706c9a-1e5d-45a5-be05-c1fbb0a12119</ClientId>
+    <VendorId>com.YOUR COMPANY NAME</VendorId>
+    <VendorDescription>YOUR COMPANY NAME, YOUR COMPANY URL</VendorDescription>
+  </AddIn>
+  <AddIn Type="Application">
+    <Name>TwinWalls</Name>
+    <Assembly>TwinWalls\TwinWalls.dll</Assembly>
+    <FullClassName>TwinWalls.App</FullClassName>
+    <ClientId>637b39a1-3fe8-489e-a5d4-e1d8e4b2ad8a</ClientId>
+    <VendorId>com.YOUR COMPANY NAME</VendorId>
+    <VendorDescription>YOUR COMPANY NAME, YOUR COMPANY URL</VendorDescription>
+  </AddIn>
+</RevitAddIns>
