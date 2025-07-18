@@ -44,16 +44,35 @@ namespace TwinWalls
                     return Result.Cancelled;
                 }
 
+                // create & start transaction
+                using(Transaction t = new Transaction(curDoc, "Twin Walls"))
+                {
+                    t.Start();
+
+                    // loop through the walls and perform the twin operation
+                    foreach (Wall originalWall in exteriorWalls)
+                    {
+                        ConvertToTwinWalls(curDoc, originalWall);
+                    }
+
+                    // commit the transaction
+                    t.Commit();
+                }
+
                 // notify the user
                 Utils.TaskDialogInformation("Information", "Twin Walls", $"Revit found {exteriorWalls.Count} exterior walls.");            
+                return Result.Succeeded;
             }
             catch (Exception ex)
             {
-                TaskDialog.Show("Error", $"An error occurred while creating the selection filter: {ex.Message}");
+                Utils.TaskDialogError("Error", "TwinWalls", $"An error occurred while creating the selection filter: {ex.Message}");
                 return Result.Failed;
             }
+        }
 
-            return Result.Succeeded;
+        private void ConvertToTwinWalls(Document curDoc, Wall originalWall)
+        {
+            throw new NotImplementedException();
         }
 
         private class WallSelectionFilter : ISelectionFilter
