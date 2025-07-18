@@ -68,12 +68,7 @@ namespace TwinWalls
                 Utils.TaskDialogError("Error", "TwinWalls", $"An error occurred while creating the selection filter: {ex.Message}");
                 return Result.Failed;
             }
-        }
-
-        private void ConvertToTwinWalls(Document curDoc, Wall originalWall)
-        {
-            throw new NotImplementedException();
-        }
+        }        
 
         private class WallSelectionFilter : ISelectionFilter
         {
@@ -103,6 +98,130 @@ namespace TwinWalls
             return false;
         }
 
+        private void ConvertToTwinWalls(Document curDoc, Wall originalWall)
+        {
+            // get wall type of the original wall
+            WallType originalWallType = originalWall.WallType;
+
+            // get corresponding twin wall types
+            WallType structuralWallType = GetStructuralWallType(curDoc, originalWallType);
+            WallType architecturalWallType = GetArchitecturalWallType(curDoc, originalWallType);
+
+            // null check for wall types
+            if (structuralWallType == null || architecturalWallType == null)
+            {
+                Utils.TaskDialogWarning("Warning", "Twin Walls", $"Could not find corresponding twin wall types for: {originalWallType.Name}.");
+                return;
+            }
+
+            // save original wall offset and extension parameter values
+            double originalBaseOffset = originalWall.get_Parameter(BuiltInParameter.WALL_BASE_OFFSET).AsDouble();
+            double originalTopOffset = originalWall.get_Parameter(BuiltInParameter.WALL_TOP_OFFSET).AsDouble();
+            double originalBaseExtension = originalWall.get_Parameter(BuiltInParameter.WALL_BOTTOM_EXTENSION_DIST_PARAM).AsDouble();
+            double originalTopExtension = originalWall.get_Parameter(BuiltInParameter.WALL_TOP_EXTENSION_DIST_PARAM).AsDouble();
+
+            // set/verify original wall location line
+            Parameter paramLocationLine = originalWall.get_Parameter(BuiltInParameter.WALL_KEY_REF_PARAM);
+            paramLocationLine.Set((int)WallLocationLine.CoreExterior);
+
+            // replace original wall with structural wall
+            originalWall.WallType = structuralWallType;
+
+            // set Base Offset to 0
+            Parameter baseOffsetParam = originalWall.get_Parameter(BuiltInParameter.WALL_BASE_OFFSET);
+            baseOffsetParam.Set(0.0);
+
+            // set Base Extension Distance to 0
+            Parameter baseExtensionParam = originalWall.get_Parameter(BuiltInParameter.WALL_BOTTOM_EXTENSION_DIST_PARAM);
+            baseExtensionParam.Set(0.0);
+
+            // Set Top Offset to 0
+            Parameter topOffsetParam = originalWall.get_Parameter(BuiltInParameter.WALL_TOP_OFFSET);
+            topOffsetParam.Set(0.0);
+
+            // Set Top Extension Distance to 0
+            Parameter topExtensionParam = originalWall.get_Parameter(BuiltInParameter.WALL_TOP_EXTENSION_DIST_PARAM);
+            topExtensionParam.Set(0.0);
+        }
+
+        private WallType GetStructuralWallType(Document doc, WallType originalType)
+        {
+            string structuralName = ParseStructuralWallName(originalType.Name);
+            if (!string.IsNullOrEmpty(structuralName))
+            {
+                return GetWallTypeByName(doc, structuralName);
+            }
+            return null;
+        }
+
+        private WallType GetArchitecturalWallType(Document doc, WallType originalType)
+        {
+            string architecturalName = ParseArchitecturalWallName(originalType.Name);
+            if (!string.IsNullOrEmpty(architecturalName))
+            {
+                return GetWallTypeByName(doc, architecturalName);
+            }
+            return null;
+        }
+
+        private string ParseStructuralWallName(string originalWallName)
+        {
+            // Pattern to match stud sizes like 2x4, 2x6, 2x8, etc.
+            var studPattern = @"\b(\d+x\d+)\b";
+            var match = System.Text.RegularExpressions.Regex.Match(originalWallName, studPattern);
+
+            if (match.Success)
+            {
+                string studSize = match.Groups[1].Value;
+                return $"{studSize},GWB";
+            }
+
+            return null;
+        }
+
+        private string ParseArchitecturalWallName(string originalWallName)
+        {
+            // Extract everything before the stud size and replace with "Shthng"
+            var studPattern = @",\d+x\d+,GWB";
+            string architecturalPortion = System.Text.RegularExpressions.Regex.Replace(originalWallName, studPattern, ",Shthng");
+
+            // Only return if we actually made a replacement (meaning it was an exterior wall)
+            if (architecturalPortion != originalWallName)
+            {
+                return architecturalPortion;
+            }
+
+            return null;
+        }
+
+        private WallType GetWallTypeByName(Document doc, string name)
+        {
+            FilteredElementCollector collector = new FilteredElementCollector(doc);
+            return collector.OfClass(typeof(WallType))
+                           .Cast<WallType>()
+                           .FirstOrDefault(wt => wt.Name == name);
+        }
+
+        private void CopyWallParameters(Wall source, Wall target)
+        {
+            // Copy common parameters
+            Parameter sourceHeight = source.get_Parameter(BuiltInParameter.WALL_USER_HEIGHT_PARAM);
+            Parameter targetHeight = target.get_Parameter(BuiltInParameter.WALL_USER_HEIGHT_PARAM);
+            if (sourceHeight != null && targetHeight != null && !targetHeight.IsReadOnly)
+            {
+                targetHeight.Set(sourceHeight.AsDouble());
+            }
+
+            Parameter sourceOffset = source.get_Parameter(BuiltInParameter.WALL_BASE_OFFSET);
+            Parameter targetOffset = target.get_Parameter(BuiltInParameter.WALL_BASE_OFFSET);
+            if (sourceOffset != null && targetOffset != null && !targetOffset.IsReadOnly)
+            {
+                targetOffset.Set(sourceOffset.AsDouble());
+            }
+
+            // Add more parameter copying as needed
+        }
+
         internal static PushButtonData GetButtonData()
         {
             // use this method to define the properties for this command in the Revit ribbon
@@ -120,5 +239,4 @@ namespace TwinWalls
             return myButtonData.Data;
         }
     }
-
 }
