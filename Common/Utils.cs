@@ -2,6 +2,32 @@
 {
     internal static class Utils
     {
+        #region Families
+
+        //return list of all generic family instances in the current model
+        public static List<FamilyInstance> GetAllGenericModelFamilies(Document curDoc)
+        {
+            ElementClassFilter m_famFilter = new ElementClassFilter(typeof(FamilyInstance));
+            ElementCategoryFilter m_typeFilter = new ElementCategoryFilter(BuiltInCategory.OST_GenericModel);
+            LogicalAndFilter andFilter = new LogicalAndFilter(m_famFilter, m_typeFilter);
+
+            FilteredElementCollector col = new FilteredElementCollector(curDoc);
+            col.WherePasses(andFilter);
+
+            List<FamilyInstance> m_famList = new List<FamilyInstance>();
+
+            foreach (FamilyInstance fam in col)
+            {
+                m_famList.Add(fam);
+            }
+
+            return m_famList;
+        }
+
+
+
+
+        #endregion
         internal static RibbonPanel CreateRibbonPanel(UIControlledApplication app, string tabName, string panelName)
         {
             RibbonPanel curPanel;

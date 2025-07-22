@@ -44,8 +44,33 @@ namespace TwinWalls
                     return Result.Cancelled;
                 }
 
+                // get all generic models hosted to the exterior walls
+                var hostedGenericModels = GetAllGenericModelsHostedToExtWalls(curDoc, exteriorWalls);
+
+                // check if not null
+                if (hostedGenericModels != null)
+                {
+                    // Create a list to store the captured data
+                    var capturedData = new List<clsExtHostedGenericModels>();
+
+                    // loop through the generic models and save their information
+                    foreach (FamilyInstance model in hostedGenericModels)
+                    {
+                        // Capture the data for this model
+                        var capturedModel = new clsExtHostedGenericModels(
+                            model.Symbol.Family.Name,
+                            model.Symbol
+                        );
+
+                        // Add to your collection
+                        capturedData.Add(capturedModel);
+                    }
+
+                    // Then delete the original models, convert walls, etc.
+                }
+
                 // create & start transaction
-                using(Transaction t = new Transaction(curDoc, "Twin Walls"))
+                using (Transaction t = new Transaction(curDoc, "Twin Walls"))
                 {
                     t.Start();
 
@@ -68,7 +93,36 @@ namespace TwinWalls
                 Utils.TaskDialogError("Error", "TwinWalls", $"An error occurred while creating the selection filter: {ex.Message}");
                 return Result.Failed;
             }
-        }        
+        }
+
+        private List<FamilyInstance> GetAllGenericModelsHostedToExtWalls(Document curDoc, IList<Wall> exteriorWalls)
+        {
+            // gat all generic model families in the current model
+            var m_allGenericModels = Utils.GetAllGenericModelFamilies(curDoc);
+
+            // create a list to hold the generic models hosted to exterior wall
+            var m_hostedGenericModels = new List<FamilyInstance>();
+
+            // loop through the generic models and check if they are hosted to exterior walls
+            foreach (FamilyInstance curGM in m_allGenericModels)
+            {
+                // check if the generic model is hosted to an exterior wall
+                if (curGM.Host != null && curGM.Host is Wall wall && exteriorWalls.Contains(wall))
+                {
+                    m_hostedGenericModels.Add(curGM);
+                }
+            }
+
+            // return the list of generic models hosted to exterior walls
+            if (m_hostedGenericModels.Count > 0)
+            {
+                return m_hostedGenericModels;
+            }
+            else
+            {                
+                return null;
+            }
+        }
 
         private class WallSelectionFilter : ISelectionFilter
         {
