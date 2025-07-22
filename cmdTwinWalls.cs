@@ -235,9 +235,9 @@ namespace TwinWalls
 
         private string ParseArchitecturalWallName(string originalWallName)
         {
-            // Extract everything before the stud size and replace with "Shthng"
+            // Extract everything before the stud size and replace with "Shthg"
             var studPattern = @",\d+x\d+,GWB";
-            string architecturalPortion = System.Text.RegularExpressions.Regex.Replace(originalWallName, studPattern, ",Shthng");
+            string architecturalPortion = System.Text.RegularExpressions.Regex.Replace(originalWallName, studPattern, ",Shthg");
 
             // Only return if we actually made a replacement (meaning it was an exterior wall)
             if (architecturalPortion != originalWallName)
